@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>cnt-template test</title>
+</head>
+<body>
+  <strong>Please open console to view the test result.</strong>
+  <script type="text/javascript" src="../builds/index.js"></script>
+  <script>
+var contentTpl = '{{if isSinglePic}}\n<a {{if imgTargetUrl}}href="{{imgTargetUrl}}"{{/if}} class="full-img">\n<img src="{{imgUrl}}">\n</a>\n{{else}}\n<div class="content-block content-wrap">\n{{if imgUrl}}\n<a {{if imgTargetUrl}}href="{{imgTargetUrl}}"{{/if}} class="img-wrap" style="background-image: url({{imgUrl}})"></a>\n{{/if}}\n{{if textTitle}}\n<h4>{{textTitle}}</h4>\n{{/if}}\n{{if detailText}}\n<p>{{detailText}}</p>\n{{/if}}\n</div>\n{{if buttonText}}\n<div class="content-block">\n<a class="button button-fill external" href="{{buttonUrl}}">{{buttonText}}</a>\n</div>\n{{first.second}}\n{{/if}}\n{{/if}}';
+
+var mockdata = {
+  buttonText: "我知道了<h1>Test</h1>",
+  buttonUrl: null,
+  detailText: "预计<strong>HH:MM-HH:MM</strong>期间暂停，给您带来不便，敬请谅解！期间暂停，给您带来不便，敬请谅解！期间暂停，给您带来不便，敬请谅解！",
+  imgTargetUrl: null,
+  imgUrl: "https://m-zl.mucfc.com/static/serverImgs/icon_arning_x3.png",
+  textTitle: '期间暂停，给您带来不便，敬请谅解！',
+  pageTitle: '哈哈哈哈',
+  outlineText: null,
+  title: null,
+  isSinglePic: false,
+  first: {
+    second: "by CntChen"
+  }
+};
+
+document.write(CntTemplate(contentTpl, mockdata));
+  </script>
+</body>
+</html>

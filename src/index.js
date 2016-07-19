@@ -1,0 +1,109 @@
+/**
+ * @author: chenhanjie
+ * @date:   2016-07-16
+ * @desc:   基本遵循artTemplate语法的HTML模板引擎
+ */
+
+const IdentifyWholeLineSyntaxReg = /^\s*{{[\w\W]+}}$/;
+const HasInlineSyntaxReg = /{{[\w\W]*?}}/;
+const SplitInlineBlockReg = /({{[\w\W]*?}})/;
+const GetSyntaxContentReg = /^\s*{{\s*|\s*}}$/g;
+const SyntaxKeywordFilterReg = /^(?:(if)|(else\sif)|(include)|(each)|(for))(?=\s+)|^(?:(\/if)|(else))\s*$|^(#\b)/;
+
+const CharacterEntity = {
+  '&': '&#38;',
+  '<': '&#60;',
+  '>': '&#62;',
+  '"': '&#34;',
+  '\\\'': '&#39;',
+};
+
+const DataObjName = 'DataObj';
+const ResultStrArrName = 'ResultStrArr';
+
+
+let trim = (str) => {
+  return str.replace(/^\s*|\s*$/g, '');
+}
+
+
+let removeUnnecessarySpace = (str) => {
+  return str.replace(/\s+/g, ' ');
+}
+
+
+let addStringToResultStrArr = (str) => {
+  return ResultStrArrName + '.push(\'' + str + '\');';
+}
+
+
+let addExpressionToResultStrArr = (expression, isNeedEncode) => {
+  if (isNeedEncode) {
+    let characterEntiryFunctionStr = Object.keys(CharacterEntity).reduce((pre, cur) => {
+      return pre + '.replace(/' + cur + '/g,\'' + CharacterEntity[cur] + '\')';
+    }, '');
+    let encodedStr = '(' + expression + ')&&(' + expression + characterEntiryFunctionStr + ')';
+    return ResultStrArrName + '.push(' + encodedStr + ');';
+  }
+  return ResultStrArrName + '.push(' + expression + ');';
+}
+
+
+let multiLineEngine = (tplLineArr) => {
+  return tplLineArr.map((oneLine) => {
+    return oneLine.match(IdentifyWholeLineSyntaxReg) ? wholeLineSyntaxParse(oneLine) : oneLine.match(HasInlineSyntaxReg) ? inlineEngine(oneLine) : addStringToResultStrArr(trim(oneLine));
+  }).join('');
+}
+
+
+let wholeLineSyntaxParse = (syntaxString) => {
+  syntaxString = removeUnnecessarySpace(syntaxString);
+  let syntaxContent = syntaxString.replace(GetSyntaxContentReg, '');
+
+  let syntaxKeywordFilter = syntaxContent.match(SyntaxKeywordFilterReg);
+  let syntaxKeyword = (syntaxKeywordFilter && syntaxKeywordFilter[0]) || '';
+  let expressionStr = trim(syntaxContent.slice(syntaxKeyword.length)) || '';
+  expressionStr = expressionStr && expressionStr.replace(/(?:[\w\$_]+)(?:\.[\w\$_]+)*/g, (match) => {
+    return DataObjName + '.' + match;
+  });
+
+  let syntaxParseResult = '';
+  switch (syntaxKeyword) {
+    case 'if':
+      syntaxParseResult = 'if(' + expressionStr + '){';
+      break;
+    case 'else':
+      syntaxParseResult = '}else{'
+      break;
+    case 'else if':
+      syntaxParseResult = '}else if(' + expressionStr + '){';
+      break;
+    case '/if':
+      syntaxParseResult = '}';
+      break;
+    case '#':
+      syntaxParseResult = addExpressionToResultStrArr(expressionStr);
+      break;
+    default:
+      syntaxParseResult = addExpressionToResultStrArr(expressionStr, true);
+      break;
+  }
+
+  return syntaxParseResult;
+}
+
+
+let inlineEngine = (tplStr) => {
+  let tplBlockArr = tplStr.split(SplitInlineBlockReg);
+
+  return multiLineEngine(tplBlockArr);
+}
+
+let CntTemplate = (tplStr, dataObj) => {
+  let tplResultStr = 'var ' + ResultStrArrName + '=[];';
+  tplResultStr += multiLineEngine(tplStr.split('\n'));
+  tplResultStr = tplResultStr + 'return ' + ResultStrArrName + '.join(\'\');';
+  return (new Function(DataObjName, tplResultStr))(dataObj);
+}
+
+export {CntTemplate};
