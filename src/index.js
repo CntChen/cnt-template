@@ -51,7 +51,7 @@ let addExpressionToResultStrArr = (expression, isNeedEncode) => {
 
 let multiLineEngine = (tplLineArr) => {
   return tplLineArr.map((oneLine) => {
-    return oneLine.match(IdentifyWholeLineSyntaxReg) ? wholeLineSyntaxParse(oneLine) : oneLine.match(HasInlineSyntaxReg) ? inlineEngine(oneLine) : addStringToResultStrArr(trim(oneLine));
+    return oneLine.match(IdentifyWholeLineSyntaxReg) ? wholeLineSyntaxParse(oneLine) : oneLine.match(HasInlineSyntaxReg) ? inlineEngine(oneLine) : addStringToResultStrArr(oneLine);
   }).join('');
 }
 
@@ -103,6 +103,7 @@ let CntTemplate = (tplStr, dataObj) => {
   let tplResultStr = 'var ' + ResultStrArrName + '=[];';
   tplResultStr += multiLineEngine(tplStr.split('\n'));
   tplResultStr = tplResultStr + 'return ' + ResultStrArrName + '.join(\'\');';
+
   return (new Function(DataObjName, tplResultStr))(dataObj);
 }
 
