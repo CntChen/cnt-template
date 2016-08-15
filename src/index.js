@@ -8,7 +8,7 @@ const IdentifyWholeLineSyntaxReg = /^\s*{{[\w\W]+}}$/;
 const HasInlineSyntaxReg = /{{[\w\W]*?}}/;
 const SplitInlineBlockReg = /({{[\w\W]*?}})/;
 const GetSyntaxContentReg = /^\s*{{\s*|\s*}}$/g;
-const SyntaxKeywordFilterReg = /^(?:(if)|(else\sif)|(include)|(each)|(for))(?=\s+)|^(?:(\/if)|(else))\s*$|^(#\b)/;
+const SyntaxKeywordFilterReg = /^(?:(if)|(else\sif)|(include)|(each)|(for))(?=\s+)|^(?:(\/if)|(else)|(\/each))\s*$|^(#\b)|^(\$\b)/;
 
 const CharacterEntity = {
   '&': '&#38;',
@@ -63,29 +63,39 @@ let wholeLineSyntaxParse = (syntaxString) => {
   let syntaxKeywordFilter = syntaxContent.match(SyntaxKeywordFilterReg);
   let syntaxKeyword = (syntaxKeywordFilter && syntaxKeywordFilter[0]) || '';
   let expressionStr = trim(syntaxContent.slice(syntaxKeyword.length)) || '';
-  expressionStr = expressionStr && expressionStr.replace(/(?:[\w\$_]+)(?:\.[\w\$_]+)*/g, (match) => {
+
+  let expressionStr_objAdded = expressionStr && expressionStr.replace(/(?:[\w\$_]+)(?:\.[\w\$_]+)*/g, (match) => {
     return DataObjName + '.' + match;
   });
 
   let syntaxParseResult = '';
   switch (syntaxKeyword) {
     case 'if':
-      syntaxParseResult = 'if(' + expressionStr + '){';
+      syntaxParseResult = 'if(' + expressionStr_objAdded + '){';
       break;
     case 'else':
       syntaxParseResult = '}else{'
       break;
     case 'else if':
-      syntaxParseResult = '}else if(' + expressionStr + '){';
+      syntaxParseResult = '}else if(' + expressionStr_objAdded + '){';
       break;
     case '/if':
       syntaxParseResult = '}';
       break;
-    case '#':
+    case 'each':
+      syntaxParseResult = 'for( index in ' + expressionStr_objAdded + '){var value=' + expressionStr_objAdded + '[index];';
+      break;
+    case '/each':
+      syntaxParseResult = '}';
+      break;
+    case '$':
       syntaxParseResult = addExpressionToResultStrArr(expressionStr);
       break;
+    case '#':
+      syntaxParseResult = addExpressionToResultStrArr(expressionStr_objAdded);
+      break;
     default:
-      syntaxParseResult = addExpressionToResultStrArr(expressionStr, true);
+      syntaxParseResult = addExpressionToResultStrArr(expressionStr_objAdded, true);
       break;
   }
 
@@ -104,6 +114,7 @@ let CntTemplate = (tplStr, dataObj) => {
   tplResultStr += multiLineEngine(tplStr.split('\n'));
   tplResultStr = tplResultStr + 'return ' + ResultStrArrName + '.join(\'\');';
 
+  console.log(tplResultStr);
   return (new Function(DataObjName, tplResultStr))(dataObj);
 }
 
