@@ -59,4 +59,8 @@ javaScript模板引擎原理，几行代码的事
 >http://www.cnblogs.com/hustskyking/p/principle-of-javascript-template.html
 [javaScript模板引擎原理，几行代码的事]:http://www.cnblogs.com/hustskyking/p/principle-of-javascript-template.html
 
+高性能JavaScript模板引擎原理解析
+>http://cdc.tencent.com/2012/06/15/%E9%AB%98%E6%80%A7%E8%83%BDjavascript%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/
+[高性能JavaScript模板引擎原理解析]:http://cdc.tencent.com/2012/06/15/%E9%AB%98%E6%80%A7%E8%83%BDjavascript%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/
+
 ## 完
