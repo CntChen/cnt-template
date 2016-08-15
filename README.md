@@ -19,9 +19,23 @@ update: *当我做完自己的模板引擎后，感觉其实artTemplate也不重
 `{{#variable}}` `{{#variable.subVariable}}`
 `#` **语法表示不对替换的数据做转义处理**
 
-* each `未开发`
+* each 只支持以下语法
+```
+{{each list}}
+    <li>{{$index}} - {{$value.user}}</li>
+{{/each}}
+```
+其中`index`和`value`为固定的变量名，表示数组/对象的`key，value`
 
-## 分析
+## 示例
+```
+// test syntax
+$ node test/test_node.js
+// test each syntax
+$ node test/test_each.js
+```
+
+## 开发分析
 
 ### 分词+文本替换
 

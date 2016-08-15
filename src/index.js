@@ -114,7 +114,6 @@ let CntTemplate = (tplStr, dataObj) => {
   tplResultStr += multiLineEngine(tplStr.split('\n'));
   tplResultStr = tplResultStr + 'return ' + ResultStrArrName + '.join(\'\');';
 
-  console.log(tplResultStr);
   return (new Function(DataObjName, tplResultStr))(dataObj);
 }
 
